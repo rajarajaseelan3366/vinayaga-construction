@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Portal | Vinayaga Construction</title>
+  <link rel="icon" type="image/jpeg" href="../logo/WhatsApp Image 2026-09-29 at 11.07.27 PM (1).jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- LOGIN SCREEN                               -->
+  <!-- ══════════════════════════════════════════ -->
+  <div id="login-screen">
+    <div class="login-card">
+      <img src="../logo/WhatsApp Image 2026-09-29 at 11.07.27 PM (1).jpeg" alt="Vinayaga Construction Logo" class="login-logo" />
+      <h1 class="login-title">VINAYAGA CONSTRUCTION</h1>
+      <div class="login-subtitle">ADMINISTRATION PORTAL</div>
+
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="login-username">Admin Username</label>
+          <input type="text" id="login-username" class="form-input" placeholder="e.g. admin" value="admin" required autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" class="form-input" placeholder="Enter password" required autocomplete="current-password" />
+        </div>
+        <div id="login-error" class="login-error"></div>
+        <button type="submit" class="btn-primary" style="justify-content: center; width: 100%; margin-top: 0.5rem; padding: 0.85rem;">
+          SIGN IN TO DASHBOARD
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- MAIN ADMIN APP                             -->
+  <!-- ══════════════════════════════════════════ -->
+  <div id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../logo/WhatsApp Image 2026-09-29 at 11.07.27 PM (1).jpeg" alt="Vinayaga Logo" class="sidebar-logo" />
+        <div>
+          <div class="sidebar-brand-name">VINAYAGA</div>
+          <div class="sidebar-brand-badge">ADMIN CONTROL</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-tab="overview">
+          <span class="icon">📊</span>
+          <span>Overview</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="projects">
+          <span class="icon">🏗️</span>
+          <span>Projects</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="services">
+          <span class="icon">🛠️</span>
+          <span>Services</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="contact">
+          <span class="icon">📞</span>
+          <span>Company & Contact</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../" target="_blank" class="btn-secondary-sm" title="View Public Website">
+          <span>🌐</span>
+          <span>View Live Website</span>
+        </a>
+        <button id="btn-logout" class="btn-secondary-sm btn-logout" title="Sign Out">
+          <span>🚪</span>
+          <span>Log Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button id="sidebar-mobile-toggle" style="font-size: 1.3rem; color: var(--gold); display: none;">☰</button>
+          <h1 class="topbar-title" id="topbar-title">Overview Dashboard</h1>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn-primary" onclick="openProjectModal()">
+            <span>+</span> Add Project
+          </button>
+          <a href="../" target="_blank" class="btn-primary-outline">
+            Live Preview ↗
+          </a>
+        </div>
+      </header>
+
+      <!-- Content Body with Tab Panes -->
+      <main class="content-body">
+
+        <!-- ── TAB 1: OVERVIEW ── -->
+        <section id="tab-overview" class="tab-pane active">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">🏗️</div>
+              <div class="stat-info">
+                <span class="stat-value" id="stat-total-projects">0</span>
+                <span class="stat-label">Total Projects</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">✅</div>
+              <div class="stat-info">
+                <span class="stat-value" id="stat-completed-projects">0</span>
+                <span class="stat-label">Completed</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⏳</div>
+              <div class="stat-info">
+                <span class="stat-value" id="stat-ongoing-projects">0</span>
+                <span class="stat-label">Ongoing</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">✨</div>
+              <div class="stat-info">
+                <span class="stat-value" id="stat-total-services">0</span>
+                <span class="stat-label">Active Services</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-panel" style="max-width: 100%; margin-bottom: 2rem;">
+            <h3 style="font-family: var(--font-display); font-size: 1.4rem; color: var(--white); margin-bottom: 0.8rem;">
+              Quick Management Controls
+            </h3>
+            <p style="font-size: 0.82rem; color: var(--grey-light); margin-bottom: 1.5rem; line-height: 1.7;">
+              All updates made in this admin dashboard immediately synchronize with the live Vinayaga Construction public 3D website. You can create custom projects, upload high-resolution images, manage services, and modify company contact info.
+            </p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <button class="btn-primary" onclick="document.querySelector('[data-tab=projects]').click()">
+                Manage Projects
+              </button>
+              <button class="btn-primary-outline" onclick="document.querySelector('[data-tab=services]').click()">
+                Manage Services
+              </button>
+              <button class="btn-primary-outline" onclick="document.querySelector('[data-tab=contact]').click()">
+                Edit Contact Info
+              </button>
+              <button id="btn-reset-defaults" class="btn-secondary-sm" style="color: var(--grey-light); margin-left: auto;">
+                🔄 Reset to Defaults
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── TAB 2: PROJECTS ── -->
+        <section id="tab-projects" class="tab-pane">
+          <div class="pane-header">
+            <div class="pane-title-group">
+              <h2>Architectural Projects Portfolio</h2>
+              <p>Add, edit or remove projects displayed on the public website showcase.</p>
+            </div>
+            <button class="btn-primary" onclick="openProjectModal()">
+              <span>+</span> Add New Project
+            </button>
+          </div>
+
+          <div id="projects-grid" class="projects-admin-grid">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+
+        <!-- ── TAB 3: SERVICES ── -->
+        <section id="tab-services" class="tab-pane">
+          <div class="pane-header">
+            <div class="pane-title-group">
+              <h2>Construction Services</h2>
+              <p>Manage the 8 core construction capabilities presented on the homepage.</p>
+            </div>
+            <button class="btn-primary" onclick="openServiceModal()">
+              <span>+</span> Add Service
+            </button>
+          </div>
+
+          <div id="services-grid" class="services-admin-grid">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+
+        <!-- ── TAB 4: CONTACT & COMPANY SETTINGS ── -->
+        <section id="tab-contact" class="tab-pane">
+          <div class="pane-header">
+            <div class="pane-title-group">
+              <h2>Company Details & Contact Info</h2>
+              <p>Update phone, email, WhatsApp, and brand messaging across the public website.</p>
+            </div>
+          </div>
+
+          <div class="settings-panel">
+            <form id="contact-settings-form">
+              <div class="settings-grid">
+                <div class="form-group">
+                  <label for="contact-phone">Phone Number</label>
+                  <input type="text" id="contact-phone" class="form-input" placeholder="+91 9003837874" required />
+                </div>
+                <div class="form-group">
+                  <label for="contact-whatsapp">WhatsApp Number (Digits only)</label>
+                  <input type="text" id="contact-whatsapp" class="form-input" placeholder="919003837874" required />
+                </div>
+                <div class="form-group">
+                  <label for="contact-email">Official Email Address</label>
+                  <input type="email" id="contact-email" class="form-input" placeholder="yugaseelanv2000@gmail.com" required />
+                </div>
+                <div class="form-group">
+                  <label for="contact-location">Location / Office City</label>
+                  <input type="text" id="contact-location" class="form-input" placeholder="Karaikudi, Tamil Nadu" required />
+                </div>
+                <div class="form-group full-col">
+                  <label for="contact-tagline">Main Brand Concept / Tagline</label>
+                  <input type="text" id="contact-tagline" class="form-input" placeholder="FROM VISION TO REALITY." required />
+                </div>
+                <div class="form-group full-col">
+                  <label for="contact-brandmsg">Supporting Brand Positioning Line</label>
+                  <input type="text" id="contact-brandmsg" class="form-input" placeholder="Premium Construction • Thoughtful Design • Trusted Execution" required />
+                </div>
+              </div>
+              <div style="display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn-primary">
+                  💾 Save Contact Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- MODAL: ADD / EDIT PROJECT                  -->
+  <!-- ══════════════════════════════════════════ -->
+  <div id="modal-project" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="project-modal-title" class="modal-title">Add New Project</h3>
+        <button type="button" class="btn-close-modal">&times;</button>
+      </div>
+      <form id="project-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="proj-title">Project Title *</label>
+            <input type="text" id="proj-title" class="form-input" placeholder="e.g. Karaikudi Modern Villa" required />
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label for="proj-location">Location *</label>
+              <input type="text" id="proj-location" class="form-input" placeholder="e.g. Karaikudi, Tamil Nadu" required />
+            </div>
+            <div class="form-group">
+              <label for="proj-category">Category / Area</label>
+              <input type="text" id="proj-category" class="form-input" placeholder="e.g. Residential • 4200 sq.ft" />
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label for="proj-status">Project Status</label>
+              <select id="proj-status" class="form-input">
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="ONGOING">ONGOING</option>
+                <option value="UPCOMING">UPCOMING</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="proj-date">Completion / Target Date</label>
+              <input type="month" id="proj-date" class="form-input" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="proj-desc">Project Description</label>
+            <textarea id="proj-desc" class="form-input" rows="3" placeholder="Provide architectural details, highlights, or design features..."></textarea>
+          </div>
+
+          <!-- Image Selection & Upload -->
+          <div class="form-group">
+            <label>Project Cover Image</label>
+            <div class="upload-dropzone" onclick="document.getElementById('proj-file-upload').click()">
+              <input type="file" id="proj-file-upload" accept="image/*" style="display: none;" />
+              <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">📷</div>
+              <div style="font-size: 0.8rem; font-weight: 600; color: var(--gold);">Click to Upload from Device</div>
+              <div style="font-size: 0.72rem; color: var(--grey);">Supports JPG, PNG, WebP (auto-optimized)</div>
+            </div>
+
+            <div style="margin-top: 0.8rem;">
+              <label style="font-size: 0.68rem; color: var(--grey);">Or select from project assets:</label>
+              <div class="image-presets-row">
+                <img src="../image/ezgif-frame-050.jpg" class="preset-thumb active" data-path="image/ezgif-frame-050.jpg" title="Completed Villa Night" />
+                <img src="../image/ezgif-frame-049.jpg" class="preset-thumb" data-path="image/ezgif-frame-049.jpg" title="Villa Architecture" />
+                <img src="../image/ezgif-frame-048.jpg" class="preset-thumb" data-path="image/ezgif-frame-048.jpg" title="Finishing" />
+                <img src="../image/ezgif-frame-047.jpg" class="preset-thumb" data-path="image/ezgif-frame-047.jpg" title="Structure" />
+                <img src="../image/ezgif-frame-046.jpg" class="preset-thumb" data-path="image/ezgif-frame-046.jpg" title="Structure 2" />
+                <img src="../image/ezgif-frame-045.jpg" class="preset-thumb" data-path="image/ezgif-frame-045.jpg" title="Structure 3" />
+                <img src="../image/ezgif-frame-035.jpg" class="preset-thumb" data-path="image/ezgif-frame-035.jpg" title="Mid Stage" />
+              </div>
+            </div>
+
+            <!-- Hidden input holding chosen image URL or dataURL -->
+            <input type="hidden" id="project-image-url" value="image/ezgif-frame-050.jpg" />
+            <img id="project-image-preview" src="../image/ezgif-frame-050.jpg" class="upload-preview" alt="Preview" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary-sm btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn-primary">Save Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- MODAL: ADD / EDIT SERVICE                  -->
+  <!-- ══════════════════════════════════════════ -->
+  <div id="modal-service" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="service-modal-title" class="modal-title">Add Construction Service</h3>
+        <button type="button" class="btn-close-modal">&times;</button>
+      </div>
+      <form id="service-form">
+        <div class="modal-body">
+          <div style="display: grid; grid-template-columns: 80px 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label for="serv-num">No.</label>
+              <input type="text" id="serv-num" class="form-input" placeholder="01" required />
+            </div>
+            <div class="form-group">
+              <label for="serv-icon">Icon / Emoji</label>
+              <input type="text" id="serv-icon" class="form-input" placeholder="🏛️" value="🏛️" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="serv-title">Service Title *</label>
+            <input type="text" id="serv-title" class="form-input" placeholder="e.g. Architectural Design" required />
+          </div>
+          <div class="form-group">
+            <label for="serv-desc">Description *</label>
+            <textarea id="serv-desc" class="form-input" rows="3" placeholder="Describe this construction service offering..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary-sm btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn-primary">Save Service</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast">
+    <span>✨</span>
+    <span id="toast-msg">Operation completed</span>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
