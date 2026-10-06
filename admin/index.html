@@ -23,8 +23,8 @@
 
       <form id="login-form" class="login-form">
         <div class="form-group">
-          <label for="login-username">Admin Username</label>
-          <input type="text" id="login-username" class="form-input" placeholder="e.g. admin" value="admin" required autocomplete="username" />
+          <label for="login-username">Admin Email</label>
+          <input type="email" id="login-username" class="form-input" placeholder="Your Supabase admin email" required autocomplete="username" />
         </div>
         <div class="form-group">
           <label for="login-password">Password</label>
@@ -41,7 +41,7 @@
   <!-- ══════════════════════════════════════════ -->
   <!-- MAIN ADMIN APP                             -->
   <!-- ══════════════════════════════════════════ -->
-  <div id="app">
+  <div id="app" hidden>
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
@@ -142,7 +142,7 @@
               Quick Management Controls
             </h3>
             <p style="font-size: 0.82rem; color: var(--grey-light); margin-bottom: 1.5rem; line-height: 1.7;">
-              All updates made in this admin dashboard immediately synchronize with the live Vinayaga Construction public 3D website. You can create custom projects, upload high-resolution images, manage services, and modify company contact info.
+              Saved updates are stored in Supabase. Refresh the public website to see the latest content. You can create custom projects, upload high-resolution images, manage services, and modify company contact info.
             </p>
             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
               <button class="btn-primary" onclick="document.querySelector('[data-tab=projects]').click()">
@@ -369,6 +369,10 @@
     <span id="toast-msg">Operation completed</span>
   </div>
 
+  <script src="../vendor/supabase.js"></script>
+  <script src="../supabase-config.js"></script>
+  <script src="../defaults.js"></script>
+  <script src="../backend.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

@@ -992,3 +992,7 @@ input, select, textarea {
     padding: 1.25rem;
   }
 }
+
+/* Hidden until server-verified admin sign-in and content load. */
+[hidden] { display: none !important; }
+button:disabled { opacity: 0.55; cursor: wait; }

@@ -1511,13 +1511,3 @@ section {
 .reveal-delay-2 { transition-delay: 0.2s; }
 .reveal-delay-3 { transition-delay: 0.3s; }
 .reveal-delay-4 { transition-delay: 0.4s; }
-
-/* Project description supplied by the admin portal */
-.project-description {
-  margin-top: 0.9rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid rgba(201,168,76,0.12);
-  color: var(--grey-light);
-  font-size: 0.78rem;
-  line-height: 1.7;
-}

@@ -570,54 +570,360 @@ function startHeroAnimation() {
 /* ──────────────────────────────────────────────────────
    DYNAMIC CONTENT SYNCHRONIZATION WITH ADMIN PORTAL
    ────────────────────────────────────────────────────── */
-async function syncDynamicContent() {
-  try {
-    const response = await fetch('api.php?action=bootstrap', {cache:'no-store'});
-    const result = await response.json();
-    if (!result.ok) throw new Error(result.message || 'Could not load site data');
-    const {projects: projs, services: servs, contact: c} = result.data || {};
-
-    const grid = document.querySelector('.projects-grid');
-    if (grid && Array.isArray(projs)) {
-      grid.innerHTML = projs.map(p => {
-        const status = p.status || 'COMPLETED';
-        const img = p.image || 'image/ezgif-frame-050.jpg';
-        return `<div class="project-card">
-          <div class="project-img"><img src="${img}" alt="${escapeHtml(p.title || 'Project')}" loading="lazy" />
-            <div class="project-overlay"><div class="project-tag">${escapeHtml(status)}</div></div>
-          </div>
-          <div class="project-info"><h3>${escapeHtml(p.title || 'Project')}</h3>
-            <p>${escapeHtml(p.location || 'Karaikudi, Tamil Nadu')}</p>
-            <span>${escapeHtml(p.category || 'Residential')}</span>
-            ${p.description ? `<div class="project-description">${escapeHtml(p.description)}</div>` : ''}
-          </div>
-        </div>`;
-      }).join('');
-    }
-
-    const servicesGrid = document.querySelector('.services-grid');
-    if (servicesGrid && Array.isArray(servs)) {
-      servicesGrid.innerHTML = servs.map(s => `<div class="service-card">
-        <div class="service-num">${escapeHtml(s.num || '01')}</div>
-        <div class="service-icon">${escapeHtml(s.icon || '🏛️')}</div>
-        <h3>${escapeHtml(s.title || '')}</h3><p>${escapeHtml(s.desc || '')}</p>
-      </div>`).join('');
-    }
-
-    if (c) {
-      if (c.phone) document.querySelectorAll('a[href^="tel:"]').forEach(a => { a.href=`tel:${c.phone.replace(/\s+/g,'')}`; a.textContent=a.textContent.includes('📞')?`📞 ${c.phone}`:c.phone; });
-      if (c.email) document.querySelectorAll('a[href^="mailto:"]').forEach(a => { a.href=`mailto:${c.email}`; if(!a.classList.contains('social-link')) a.textContent=a.textContent.includes('✉️')?`✉️ ${c.email}`:c.email; });
-      if (c.whatsapp) { const cleanWa=c.whatsapp.replace(/\D/g,''); const waUrl=`https://wa.me/${cleanWa}?text=Hi%20Vinayaga%20Construction%2C%20I'm%20interested%20in%20building%20my%20dream%20home.%20I%20would%20like%20to%20discuss%20my%20project%20and%20get%20a%20free%20quotation.%20Please%20contact%20me.`; document.querySelectorAll('a[href*="wa.me"]').forEach(a=>a.href=waUrl); }
-      if (c.location) document.querySelectorAll('.contact-item span, .footer-contact-item span').forEach(s=>{ if(s.textContent.includes('Karaikudi')||s.textContent.includes('Tamil Nadu')) s.textContent=s.textContent.includes('📍')?`📍 ${c.location}`:c.location; });
-      if (c.tagline) { const el=document.querySelector('.footer-tagline'); if(el) el.textContent=c.tagline; }
-      if (c.brandMessage) { const el=document.querySelector('.footer-brand-msg'); if(el) el.textContent=c.brandMessage; }
-    }
-  } catch (e) { console.warn('Online content sync error:', e); }
+function contentEscape(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 }
-
-function escapeHtml(str) { return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
-
-// Load online admin data on every public-site visit.
+let publicWhatsApp = '919003837874';
+async function syncDynamicContent() {
+  if (!VCBackend.configured()) { console.warn('Supabase setup is incomplete. Showing original site content.'); return; }
+  try {
+    const data = await VCBackend.load();
+    document.querySelector('.projects-grid').innerHTML = data.projects.map(p => {
+      const img = VCBackend.safeImage(p.image).replace(/^\.\.\//, '');
+      return `<div class="project-card"><div class="project-img">
+        <img src="${contentEscape(img)}" alt="${contentEscape(p.title)}" loading="lazy" />
+        <div class="project-overlay"><div class="project-tag">${contentEscape(p.status)}</div></div></div>
+        <div class="project-info"><h3>${contentEscape(p.title)}</h3><p>${contentEscape(p.location)}</p>
+        <span>${contentEscape(p.category)}</span>${p.description ? `<div class="project-description">${contentEscape(p.description)}</div>` : ''}</div></div>`;
+    }).join('');
+    document.querySelector('.services-grid').innerHTML = data.services.map(s => `<div class="service-card">
+      <div class="service-num">${contentEscape(s.num)}</div><div class="service-icon">${contentEscape(s.icon)}</div>
+      <h3>${contentEscape(s.title)}</h3><p>${contentEscape(s.desc)}</p></div>`).join('');
+    const c = data.contact;
+    document.querySelectorAll('a[href^="tel:"]').forEach(a => {
+      const icon = a.textContent.includes('📞') ? '📞 ' : '';
+      a.href = 'tel:' + String(c.phone || '').replace(/[^+\d]/g, ''); a.textContent = icon + (c.phone || '');
+    });
+    document.querySelectorAll('a[href^="mailto:"]').forEach(a => {
+      a.href = 'mailto:' + encodeURIComponent(c.email || '');
+      if (!a.classList.contains('social-link')) a.textContent = (a.textContent.includes('✉️') ? '✉️ ' : '') + (c.email || '');
+    });
+    publicWhatsApp = String(c.whatsapp || '').replace(/\D/g, '');
+    document.querySelectorAll('a[href*="wa.me"]').forEach(a => {
+      const existingQuery = new URL(a.href).search;
+      a.href = publicWhatsApp ? 'https://wa.me/' + publicWhatsApp + existingQuery : '#contact';
+    });
+    document.querySelectorAll('.contact-item span, .footer-contact-item span').forEach(s => {
+      s.textContent = (s.closest('.footer-contact-item') ? '📍 ' : '') + (c.location || '');
+    });
+    document.querySelector('.footer-tagline').textContent = c.tagline || '';
+    document.querySelector('.footer-brand-msg').textContent = c.brandMessage || '';
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
+  } catch (error) {
+    console.error('Could not load current site content:', error);
+    // Do not silently pass off old contact details as current when the backend is unavailable.
+    let notice = document.getElementById('content-status');
+    if (!notice) { notice = document.createElement('p'); notice.id = 'content-status'; notice.style.cssText = 'text-align:center;padding:12px;color:#d4af37;'; document.getElementById('footer').prepend(notice); }
+    notice.textContent = 'Current updates could not be loaded. Please refresh before using the contact details.';
+  }
+}
+// Each visit loads from Supabase, not this visitor's localStorage.
 syncDynamicContent();
-// Refresh periodically so another device's admin changes appear without a hard reload.
-setInterval(syncDynamicContent, 30000);
+window.addEventListener('pageshow', event => { if (event.persisted) syncDynamicContent(); });
+
+/* ──────────────────────────────────────────────────────
+   SCROLL REVEAL — GSAP
+   ────────────────────────────────────────────────────── */
+(function initScrollReveal() {
+  // Services cards
+  gsap.utils.toArray('.service-card').forEach((card, i) => {
+    gsap.from(card, {
+      opacity: 0, y: 50, duration: 0.8,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: card,
+        start: 'top 88%',
+        toggleActions: 'play none none none'
+      },
+      delay: (i % 4) * 0.1
+    });
+  });
+
+  // Why cards
+  gsap.utils.toArray('.why-card').forEach((card, i) => {
+    gsap.from(card, {
+      opacity: 0, y: 40, duration: 0.8,
+      ease: 'power2.out',
+      delay: i * 0.12,
+      scrollTrigger: {
+        trigger: '.why-grid',
+        start: 'top 85%',
+        toggleActions: 'play none none none'
+      }
+    });
+  });
+
+  // Project cards
+  gsap.utils.toArray('.project-card').forEach((card, i) => {
+    gsap.from(card, {
+      opacity: 0, y: 50, scale: 0.96, duration: 0.8,
+      ease: 'power2.out',
+      delay: (i % 3) * 0.12,
+      scrollTrigger: {
+        trigger: card,
+        start: 'top 88%',
+        toggleActions: 'play none none none'
+      }
+    });
+  });
+
+  // Process steps
+  document.querySelectorAll('.process-step').forEach(step => {
+    const io = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        step.classList.add('visible');
+        io.disconnect();
+      }
+    }, { threshold: 0.15 });
+    io.observe(step);
+  });
+
+  // Section headers
+  gsap.utils.toArray('.section-header').forEach(el => {
+    gsap.from(el, {
+      opacity: 0, y: 30, duration: 1,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 85%',
+        toggleActions: 'play none none none'
+      }
+    });
+  });
+
+  // About section
+  gsap.from('.about-content', {
+    opacity: 0, x: 40, duration: 1.2,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '#about',
+      start: 'top 75%',
+      toggleActions: 'play none none none'
+    }
+  });
+  gsap.from('.about-visual', {
+    opacity: 0, x: -40, duration: 1.2,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '#about',
+      start: 'top 75%',
+      toggleActions: 'play none none none'
+    }
+  });
+
+  // Night CTA
+  gsap.from('.night-headline', {
+    opacity: 0, y: 50, duration: 1.2,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '#night-cta',
+      start: 'top 70%',
+      toggleActions: 'play none none none'
+    }
+  });
+  gsap.from('.night-sub', {
+    opacity: 0, y: 30, duration: 1, delay: 0.2,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '#night-cta',
+      start: 'top 70%',
+      toggleActions: 'play none none none'
+    }
+  });
+  gsap.from('.night-btns', {
+    opacity: 0, y: 30, duration: 1, delay: 0.4,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '#night-cta',
+      start: 'top 70%',
+      toggleActions: 'play none none none'
+    }
+  });
+
+  // Contact section
+  gsap.from('.contact-left', {
+    opacity: 0, x: -40, duration: 1.2,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '#contact',
+      start: 'top 75%',
+      toggleActions: 'play none none none'
+    }
+  });
+  gsap.from('.quotation-form', {
+    opacity: 0, x: 40, duration: 1.2,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '#contact',
+      start: 'top 75%',
+      toggleActions: 'play none none none'
+    }
+  });
+
+  // Stats counter
+  gsap.utils.toArray('.stat-num').forEach(el => {
+    const final = el.textContent;
+    let numStr = final.replace(/\D/g, '');
+    let num = parseInt(numStr);
+    let suffix = final.replace(/[0-9]/g, '');
+
+    if (!isNaN(num)) {
+      gsap.from({ val: 0 }, {
+        val: num,
+        duration: 2,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        },
+        onUpdate: function () {
+          el.textContent = Math.floor(this.targets()[0].val) + suffix;
+        }
+      });
+    }
+  });
+})();
+
+/* ──────────────────────────────────────────────────────
+   CONTACT FORM
+   ────────────────────────────────────────────────────── */
+(function initContactForm() {
+  const form = document.getElementById('quotation-form');
+  const successMsg = document.getElementById('form-success');
+  if (!form) return;
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const name = formData.get('fullname');
+    const phone = formData.get('phone');
+    const message = formData.get('message') || 'No message';
+
+    // Compose WhatsApp message
+    const waText = encodeURIComponent(
+      `Hi Vinayaga Construction,\n\nI'd like to get a free quotation.\n\nName: ${name}\nPhone: ${phone}\nMessage: ${message}\n\nPlease contact me.`
+    );
+
+    // Show success
+    successMsg.classList.add('show');
+    gsap.from(successMsg, { opacity: 0, y: 10, duration: 0.4, ease: 'power2.out' });
+
+    // Auto-open WhatsApp after short delay
+    setTimeout(() => {
+      if (publicWhatsApp) window.open(`https://wa.me/${publicWhatsApp}?text=${waText}`, '_blank');
+    }, 800);
+
+    form.reset();
+    setTimeout(() => successMsg.classList.remove('show'), 5000);
+  });
+})();
+
+/* ──────────────────────────────────────────────────────
+   SERVICE CARD 3D TILT
+   ────────────────────────────────────────────────────── */
+(function initTiltEffect() {
+  document.querySelectorAll('.service-card, .why-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `translateY(-4px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg)`;
+      card.style.transition = 'transform 0.1s ease';
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+      card.style.transition = 'transform 0.4s ease';
+    });
+  });
+})();
+
+/* ──────────────────────────────────────────────────────
+   HERO PARALLAX ON MOUSE
+   ────────────────────────────────────────────────────── */
+(function initHeroMouseParallax() {
+  const heroImg = document.getElementById('hero-img');
+  if (!heroImg) return;
+
+  document.getElementById('hero').addEventListener('mousemove', e => {
+    const { clientX, clientY } = e;
+    const { innerWidth, innerHeight } = window;
+    const x = (clientX / innerWidth - 0.5) * 10;
+    const y = (clientY / innerHeight - 0.5) * 6;
+    heroImg.style.transform = `scale(1.05) translate(${x}px, ${y}px)`;
+    heroImg.style.transition = 'transform 0.3s ease-out';
+  });
+  document.getElementById('hero').addEventListener('mouseleave', () => {
+    heroImg.style.transform = 'scale(1.0)';
+    heroImg.style.transition = 'transform 0.8s ease';
+  });
+})();
+
+/* ──────────────────────────────────────────────────────
+   ACTIVE NAV LINK
+   ────────────────────────────────────────────────────── */
+(function initActiveNav() {
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.main-nav a');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.style.color = '';
+          if (link.getAttribute('href') === '#' + entry.target.id) {
+            link.style.color = 'var(--gold)';
+          }
+        });
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+})();
+
+/* ──────────────────────────────────────────────────────
+   PERFORMANCE: reduce effects on low-end devices
+   ────────────────────────────────────────────────────── */
+(function checkPerformance() {
+  // Check hardware concurrency (rough CPU indicator)
+  if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+    // Disable heavy shadows in Three.js viewer
+    const canvas = document.getElementById('house-canvas');
+    if (canvas) canvas.style.imageRendering = 'auto';
+  }
+})();
+
+/* ──────────────────────────────────────────────────────
+   LAZY LOAD IMAGES
+   ────────────────────────────────────────────────────── */
+(function initLazyLoad() {
+  if ('IntersectionObserver' in window) {
+    const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+    const imgObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src || img.src;
+          imgObserver.unobserve(img);
+        }
+      });
+    }, { rootMargin: '200px' });
+    lazyImages.forEach(img => imgObserver.observe(img));
+  }
+})();
+
+/* ──────────────────────────────────────────────────────
+   SMOOTH SCROLL TO TOP ON LOGO CLICK
+   ────────────────────────────────────────────────────── */
+document.querySelector('.header-logo')?.addEventListener('click', e => {
+  e.preventDefault();
+  gsap.to(window, { duration: 1.4, scrollTo: 0, ease: 'power3.inOut' });
+});
+
+/* ──────────────────────────────────────────────────────
+   CONSOLE BRANDING
+   ────────────────────────────────────────────────────── */
+console.log('%cVINAYAGA CONSTRUCTION', 'font-size:22px;font-weight:bold;color:#C9A84C;');
+console.log('%cFrom Vision to Reality | Karaikudi, Tamil Nadu', 'font-size:12px;color:#888;');
+console.log('%c+91 9003837874 | yugaseelanv2000@gmail.com', 'font-size:11px;color:#666;');

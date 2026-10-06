@@ -4,176 +4,6 @@
 
 'use strict';
 
-// Default Data Sets
-const DEFAULT_PROJECTS = [
-  {
-    id: 'proj_1',
-    title: 'Luxury Villa',
-    location: 'Karaikudi, Tamil Nadu',
-    category: 'Residential • 4500 sq.ft',
-    status: 'COMPLETED',
-    completionDate: '2024-03',
-    image: 'image/ezgif-frame-050.jpg',
-    description: 'Modern two-story luxury residence featuring expansive glass facades, private infinity pool, and integrated landscaped terraces.'
-  },
-  {
-    id: 'proj_2',
-    title: 'Modern Residence',
-    location: 'Karaikudi, Tamil Nadu',
-    category: 'Residential • 3200 sq.ft',
-    status: 'COMPLETED',
-    completionDate: '2024-01',
-    image: 'image/ezgif-frame-049.jpg',
-    description: 'Contemporary family home with customized interior aesthetics, high-performance acoustic glass, and ambient evening LED illumination.'
-  },
-  {
-    id: 'proj_3',
-    title: 'Premium Estate',
-    location: 'Karaikudi, Tamil Nadu',
-    category: 'Residential • 5800 sq.ft',
-    status: 'COMPLETED',
-    completionDate: '2023-11',
-    image: 'image/ezgif-frame-048.jpg',
-    description: 'Expansive luxury estate built with double-height living ceilings, organic stone cladding, and wide driveway parking.'
-  },
-  {
-    id: 'proj_4',
-    title: 'Contemporary Home',
-    location: 'Karaikudi, Tamil Nadu',
-    category: 'Residential • 2800 sq.ft',
-    status: 'ONGOING',
-    completionDate: '2025-06',
-    image: 'image/ezgif-frame-047.jpg',
-    description: 'Minimalist architecture with optimal natural cross-ventilation, energy-efficient planning, and tailored spatial layout.'
-  },
-  {
-    id: 'proj_5',
-    title: 'Executive Bungalow',
-    location: 'Karaikudi, Tamil Nadu',
-    category: 'Residential • 3900 sq.ft',
-    status: 'COMPLETED',
-    completionDate: '2023-08',
-    image: 'image/ezgif-frame-046.jpg',
-    description: 'High-end bespoke bungalow designed for executive lifestyles, premium entertainment spaces, and private manicured lawn.'
-  },
-  {
-    id: 'proj_6',
-    title: 'Designer Villa',
-    location: 'Karaikudi, Tamil Nadu',
-    category: 'Residential • 4100 sq.ft',
-    status: 'ONGOING',
-    completionDate: '2025-08',
-    image: 'image/ezgif-frame-045.jpg',
-    description: 'Architectural masterpiece incorporating cantilevered balconies, smart automation, and bespoke interior wood accents.'
-  }
-];
-
-const DEFAULT_SERVICES = [
-  {
-    id: 'serv_1',
-    num: '01',
-    icon: '🏛️',
-    title: 'Architectural Design',
-    desc: 'Bespoke architectural concepts crafted to reflect your personality and lifestyle vision.'
-  },
-  {
-    id: 'serv_2',
-    num: '02',
-    icon: '📐',
-    title: 'Building Design & Planning',
-    desc: 'Comprehensive building plans with regulatory compliance and engineering precision.'
-  },
-  {
-    id: 'serv_3',
-    num: '03',
-    icon: '🏗️',
-    title: 'Structural Construction',
-    desc: 'Robust structural frameworks using premium materials and advanced construction techniques.'
-  },
-  {
-    id: 'serv_4',
-    num: '04',
-    icon: '🔨',
-    title: 'Renovation',
-    desc: 'Transform existing spaces with thoughtful renovation that breathes new life into your property.'
-  },
-  {
-    id: 'serv_5',
-    num: '05',
-    icon: '✨',
-    title: 'Interior & Finishing',
-    desc: 'Luxury interior finishing with premium materials, textures and craftsmanship throughout.'
-  },
-  {
-    id: 'serv_6',
-    num: '06',
-    icon: '⚡',
-    title: 'Electrical & Plumbing / MEP',
-    desc: 'Complete MEP systems engineered for efficiency, safety and long-term reliability.'
-  },
-  {
-    id: 'serv_7',
-    num: '07',
-    icon: '📊',
-    title: 'Project Management',
-    desc: 'End-to-end project management ensuring timely delivery within budget and quality standards.'
-  },
-  {
-    id: 'serv_8',
-    num: '08',
-    icon: '🖥️',
-    title: '2D & 3D Planning',
-    desc: 'Detailed 2D floor plans and photorealistic 3D visualisations before construction begins.'
-  }
-];
-
-const DEFAULT_CONTACT = {
-  phone: '+91 9003837874',
-  email: 'yugaseelanv2000@gmail.com',
-  location: 'Karaikudi, Tamil Nadu',
-  whatsapp: '919003837874',
-  tagline: 'FROM VISION TO REALITY.',
-  brandMessage: 'Premium Construction • Thoughtful Design • Trusted Execution'
-};
-
-// Online API helpers (shared hosting / PHP)
-const API_URL = '../api.php';
-
-async function apiRequest(action, options = {}) {
-  const response = await fetch(`${API_URL}?action=${encodeURIComponent(action)}`, {
-    credentials: 'same-origin',
-    ...options,
-    headers: {
-      ...(options.body instanceof FormData ? {} : {'Content-Type': 'application/json'}),
-      ...(options.headers || {})
-    }
-  });
-  const result = await response.json().catch(() => ({ok:false, message:'Invalid server response'}));
-  if (!response.ok || !result.ok) throw new Error(result.message || 'Request failed');
-  return result;
-}
-
-async function getRemoteData() {
-  const result = await apiRequest('bootstrap', { method: 'GET' });
-  return result.data;
-}
-
-async function saveStoredProjects(value) {
-  const result = await apiRequest('save_projects', { method: 'POST', body: JSON.stringify({projects: value}) });
-  projects = result.data;
-  return result.data;
-}
-async function saveStoredServices(value) {
-  const result = await apiRequest('save_services', { method: 'POST', body: JSON.stringify({services: value}) });
-  services = result.data;
-  return result.data;
-}
-async function saveStoredContact(value) {
-  const result = await apiRequest('save_contact', { method: 'POST', body: JSON.stringify({contact: value}) });
-  contact = result.data;
-  return result.data;
-}
-
 // Toast helper
 function showToast(msg, duration = 3000) {
   const toast = document.getElementById('toast');
@@ -192,77 +22,83 @@ let services = [];
 let contact = {};
 let currentEditingProjectId = null;
 let currentEditingServiceId = null;
+let pendingImage = null;
+let busy = false;
 
-// Initialize Admin
+// Initialize Admin. No browser-only password or fake session flag.
 document.addEventListener('DOMContentLoaded', async () => {
-  const loggedIn = await initAuth();
-  if (!loggedIn) return;
-  await loadData();
+  document.getElementById('app').hidden = true;
   initTabs();
   initModals();
   initForms();
-  renderOverview();
-  renderProjects();
-  renderServices();
-  renderContactForm();
+  await initAuth();
 });
 
-// Authentication handling
-async function initAuth() {
-  const loginScreen = document.getElementById('login-screen');
-  const loginForm = document.getElementById('login-form');
-  const loginError = document.getElementById('login-error');
-  const logoutBtn = document.getElementById('btn-logout');
-
-  try {
-    const result = await apiRequest('session', {method:'GET'});
-    if (result.data && result.data.loggedIn) {
-      loginScreen.style.display = 'none';
-    } else {
-      loginScreen.style.display = 'flex';
-    }
-  } catch (e) {
-    loginScreen.style.display = 'flex';
-  }
-
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const username = document.getElementById('login-username').value.trim();
-      const password = document.getElementById('login-password').value;
-      try {
-        await apiRequest('login', {method:'POST', body: JSON.stringify({username, password})});
-        loginError.style.display = 'none';
-        loginScreen.style.display = 'none';
-        showToast('Welcome to Vinayaga Construction Admin');
-        await loadData();
-        renderOverview(); renderProjects(); renderServices(); renderContactForm();
-      } catch (err) {
-        loginError.textContent = err.message || 'Invalid username or password.';
-        loginError.style.display = 'block';
-      }
-    });
-  }
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      if (confirm('Are you sure you want to log out of the admin panel?')) {
-        try { await apiRequest('logout', {method:'POST'}); } catch (_) {}
-        loginScreen.style.display = 'flex';
-        showToast('Logged out successfully');
-      }
-    });
-  }
-
-  return loginScreen.style.display === 'none';
+async function loadData() {
+  const data = await VCBackend.load();
+  projects = data.projects;
+  services = data.services;
+  contact = data.contact;
+  renderOverview(); renderProjects(); renderServices(); renderContactForm();
 }
 
-// Load Data
-async function loadData() {
-  const data = await getRemoteData();
-  projects = Array.isArray(data.projects) && data.projects.length ? data.projects : DEFAULT_PROJECTS;
-  services = Array.isArray(data.services) && data.services.length ? data.services : DEFAULT_SERVICES;
-  contact = data.contact && Object.keys(data.contact).length ? data.contact : DEFAULT_CONTACT;
+function setLoggedOut(message = '') {
+  document.getElementById('app').hidden = true;
+  document.getElementById('login-screen').style.display = 'flex';
+  const error = document.getElementById('login-error');
+  error.textContent = message;
+  error.style.display = message ? 'block' : 'none';
+}
+
+async function openDashboard() {
+  await VCBackend.requireAdmin();
+  await loadData();
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').hidden = false;
+}
+
+async function initAuth() {
+  const form = document.getElementById('login-form');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = form.querySelector('button');
+    button.disabled = true;
+    try {
+      await VCBackend.signIn(document.getElementById('login-username').value.trim(),
+        document.getElementById('login-password').value);
+      await openDashboard();
+      document.getElementById('login-password').value = '';
+      showToast('Signed in. Changes now save to Supabase.');
+    } catch (error) { setLoggedOut(error.message); }
+    finally { button.disabled = false; }
+  });
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    try { await VCBackend.signOut(); setLoggedOut(); }
+    catch (error) { showToast(error.message, 6000); }
+  });
+  try {
+    const session = await VCBackend.session();
+    if (session) await openDashboard();
+  } catch (error) { setLoggedOut(error.message); }
+  if (VCBackend.configured()) {
+    VCBackend.client().auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') setLoggedOut('Session ended. Sign in again.');
+    });
+  }
+}
+
+// Only show success after the server confirms the write. Failed saves keep the form open.
+async function runSave(action) {
+  if (busy) return;
+  busy = true;
+  document.querySelectorAll('#app button').forEach(b => b.disabled = true);
+  try { await action(); }
+  catch (error) { showToast('Not saved: ' + error.message, 8000); }
+  finally {
+    busy = false;
+    document.querySelectorAll('#app button').forEach(b => b.disabled = false);
+  }
 }
 
 // Navigation Tabs
@@ -353,7 +189,7 @@ function renderProjects() {
 
     card.innerHTML = `
       <div class="project-thumb-wrap">
-        <img src="${imgSrc}" alt="${escapeHtml(project.title)}" class="project-thumb" onerror="this.src='../image/ezgif-frame-050.jpg'" />
+        <img src="${escapeHtml(VCBackend.safeImage(imgSrc))}" alt="${escapeHtml(project.title)}" class="project-thumb" onerror="this.src='../image/ezgif-frame-050.jpg'" />
         <span class="project-status-badge ${statusClass}">${escapeHtml(project.status)}</span>
       </div>
       <div class="project-card-body">
@@ -383,6 +219,7 @@ function renderProjects() {
 // Open project modal for create
 window.openProjectModal = function() {
   currentEditingProjectId = null;
+  pendingImage = null;
   document.getElementById('project-modal-title').textContent = 'Add New Architectural Project';
   document.getElementById('project-form').reset();
   document.getElementById('project-image-preview').style.display = 'none';
@@ -397,6 +234,7 @@ window.editProject = function(id) {
   if (!project) return;
 
   currentEditingProjectId = id;
+  pendingImage = null;
   document.getElementById('project-modal-title').textContent = 'Edit Project: ' + project.title;
 
   document.getElementById('proj-title').value = project.title || '';
@@ -421,20 +259,18 @@ window.editProject = function(id) {
 // Delete project
 window.deleteProject = async function(id) {
   const project = projects.find(p => p.id === id);
-  if (!project) return;
-
-  if (confirm(`Are you sure you want to delete the project "${project.title}"? This change will reflect on the public website.`)) {
-    projects = projects.filter(p => p.id !== id);
-    try { await saveStoredProjects(projects); } catch (e) { showToast(e.message || 'Could not save project.'); return; }
-    renderProjects();
-    showToast(`Project "${project.title}" deleted.`);
-  }
+  if (!project || !confirm(`Delete project "${project.title}" from the public site?`)) return;
+  await runSave(async () => {
+    await VCBackend.saveSection('projects', projects.filter(p => p.id !== id));
+    await loadData();
+    showToast('Project deleted from Supabase.');
+  });
 };
 
 // Update preview image
 function updateProjectImagePreview(src) {
   const preview = document.getElementById('project-image-preview');
-  preview.src = src;
+  preview.src = VCBackend.safeImage(src);
   preview.style.display = 'block';
 }
 
@@ -513,14 +349,12 @@ window.editService = function(id) {
 // Delete Service
 window.deleteService = async function(id) {
   const service = services.find(s => s.id === id);
-  if (!service) return;
-
-  if (confirm(`Are you sure you want to delete "${service.title}"?`)) {
-    services = services.filter(s => s.id !== id);
-    try { await saveStoredServices(services); } catch (e) { showToast(e.message || 'Could not save service.'); return; }
-    renderServices();
-    showToast(`Service "${service.title}" deleted.`);
-  }
+  if (!service || !confirm(`Delete service "${service.title}"?`)) return;
+  await runSave(async () => {
+    await VCBackend.saveSection('services', services.filter(s => s.id !== id));
+    await loadData();
+    showToast('Service deleted from Supabase.');
+  });
 };
 
 // ══════════════════════════════════════════════════════════
@@ -586,91 +420,80 @@ function initModals() {
 }
 
 function initForms() {
-  // Project Form Submit
-  const projForm = document.getElementById('project-form');
-  if (projForm) {
-    projForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const title = document.getElementById('proj-title').value.trim();
-      const location = document.getElementById('proj-location').value.trim();
-      const category = document.getElementById('proj-category').value.trim();
-      const status = document.getElementById('proj-status').value;
-      const completionDate = document.getElementById('proj-date').value;
-      const description = document.getElementById('proj-desc').value.trim();
-      const image = document.getElementById('project-image-url').value.trim() || 'image/ezgif-frame-050.jpg';
-      if (!title || !location) { alert('Please fill out the Title and Location.'); return; }
-
-      if (currentEditingProjectId) {
-        const index = projects.findIndex(p => p.id === currentEditingProjectId);
-        if (index !== -1) projects[index] = {...projects[index], title, location, category, status, completionDate, description, image};
-      } else {
-        projects.unshift({id:'proj_' + Date.now(), title, location, category: category || 'Residential Villa', status, completionDate, description, image});
-      }
-      try {
-        await saveStoredProjects(projects);
-        renderProjects(); closeModal('modal-project');
-        showToast(`Project "${title}" saved successfully.`);
-      } catch (err) { showToast(err.message || 'Could not save project.'); }
+  document.getElementById('project-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    await runSave(async () => {
+      const image = pendingImage ? await VCBackend.uploadImage(pendingImage) :
+        document.getElementById('project-image-url').value.trim();
+      const project = {
+        id: currentEditingProjectId || 'proj_' + crypto.randomUUID(),
+        title: document.getElementById('proj-title').value.trim(),
+        location: document.getElementById('proj-location').value.trim(),
+        category: document.getElementById('proj-category').value.trim() || 'Residential Villa',
+        status: document.getElementById('proj-status').value,
+        completionDate: document.getElementById('proj-date').value,
+        description: document.getElementById('proj-desc').value.trim(),
+        image: VCBackend.safeImage(image)
+      };
+      if (!project.title || !project.location) throw new Error('Title and location are required.');
+      const next = currentEditingProjectId ? projects.map(p => p.id === currentEditingProjectId ? project : p) : [project, ...projects];
+      await VCBackend.saveSection('projects', next);
+      pendingImage = null;
+      await loadData(); closeModal('modal-project');
+      showToast('Project saved to Supabase. Refresh the public site to see it.');
     });
-  }
-
-  // Image File Upload handling - upload to server storage
-  const fileInput = document.getElementById('proj-file-upload');
-  if (fileInput) {
-    fileInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      try {
-        showToast('Uploading image...');
-        const form = new FormData();
-        form.append('image', file);
-        const result = await apiRequest('upload_image', {method:'POST', body: form});
-        const path = result.data.path;
-        document.getElementById('project-image-url').value = path;
-        updateProjectImagePreview('../' + path);
-        showToast('Image uploaded successfully!');
-      } catch (err) { showToast(err.message || 'Image upload failed.'); }
-    });
-  }
-
-  // Preset Image Thumbnails Click
+  });
+  document.getElementById('proj-file-upload').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 10 * 1024 * 1024) {
+      showToast('Choose a JPG, PNG or WebP image under 10 MB.', 6000); event.target.value = ''; return;
+    }
+    const button = document.querySelector('#project-form button[type="submit"]');
+    button.disabled = true;
+    try {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Could not read image.'));
+        reader.readAsDataURL(file);
+      });
+      pendingImage = await new Promise((resolve, reject) => compressImage(dataUrl, 1200, 0.8, resolve, reject));
+      updateProjectImagePreview(pendingImage);
+      showToast('Photo ready. Click Save Project to upload it.');
+    } catch (error) { showToast(error.message, 6000); }
+    finally { button.disabled = false; }
+  });
   document.querySelectorAll('.preset-thumb').forEach(thumb => {
     thumb.addEventListener('click', () => {
-      const path = thumb.dataset.path;
-      document.getElementById('project-image-url').value = path;
-      updateProjectImagePreview('../' + path);
+      pendingImage = null;
+      document.getElementById('project-image-url').value = thumb.dataset.path;
+      updateProjectImagePreview('../' + thumb.dataset.path);
       document.querySelectorAll('.preset-thumb').forEach(t => t.classList.remove('active'));
       thumb.classList.add('active');
     });
   });
-
-  // Service Form Submit
-  const servForm = document.getElementById('service-form');
-  if (servForm) {
-    servForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const num = document.getElementById('serv-num').value.trim();
-      const icon = document.getElementById('serv-icon').value.trim() || '🏛️';
-      const title = document.getElementById('serv-title').value.trim();
-      const desc = document.getElementById('serv-desc').value.trim();
-      if (!title || !desc) { alert('Please provide a title and description.'); return; }
-      if (currentEditingServiceId) {
-        const index = services.findIndex(s => s.id === currentEditingServiceId);
-        if (index !== -1) services[index] = {...services[index], num, icon, title, desc};
-      } else {
-        services.push({id:'serv_' + Date.now(), num:num || String(services.length+1).padStart(2,'0'), icon, title, desc});
-      }
-      try { await saveStoredServices(services); renderServices(); closeModal('modal-service'); showToast(`Service "${title}" saved.`); }
-      catch (err) { showToast(err.message || 'Could not save service.'); }
+  document.getElementById('service-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    await runSave(async () => {
+      const service = {
+        id: currentEditingServiceId || 'serv_' + crypto.randomUUID(),
+        num: document.getElementById('serv-num').value.trim() || String(services.length + 1).padStart(2, '0'),
+        icon: document.getElementById('serv-icon').value.trim() || '🏗️',
+        title: document.getElementById('serv-title').value.trim(),
+        desc: document.getElementById('serv-desc').value.trim()
+      };
+      if (!service.title || !service.desc) throw new Error('Title and description are required.');
+      const next = currentEditingServiceId ? services.map(s => s.id === currentEditingServiceId ? service : s) : [...services, service];
+      await VCBackend.saveSection('services', next);
+      await loadData(); closeModal('modal-service');
+      showToast('Service saved to Supabase.');
     });
-  }
-
-  // Contact Form Submit
-  const contactForm = document.getElementById('contact-settings-form');
-  if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      contact = {
+  });
+  document.getElementById('contact-settings-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    await runSave(async () => {
+      const next = {
         phone: document.getElementById('contact-phone').value.trim(),
         email: document.getElementById('contact-email').value.trim(),
         location: document.getElementById('contact-location').value.trim(),
@@ -678,25 +501,43 @@ function initForms() {
         tagline: document.getElementById('contact-tagline').value.trim(),
         brandMessage: document.getElementById('contact-brandmsg').value.trim()
       };
-      try { await saveStoredContact(contact); showToast('Company contact details saved! Public site updated.'); }
-      catch (err) { showToast(err.message || 'Could not save contact details.'); }
+      await VCBackend.saveSection('contact', next);
+      await loadData(); showToast('Company details saved to Supabase.');
     });
-  }
+  });
+  document.getElementById('btn-reset-defaults').addEventListener('click', async () => {
+    if (!confirm('Reset the PUBLIC site projects, services and contact details to the original defaults? This replaces your custom content.')) return;
+    await runSave(async () => {
+      await VCBackend.reset(); await loadData();
+      showToast('Public content reset to defaults.');
+    });
+  });
+}
 
-  // Reset to Defaults Button
-  const resetBtn = document.getElementById('btn-reset-defaults');
-  if (resetBtn) {
-    resetBtn.addEventListener('click', async () => {
-      if (confirm('Are you sure you want to reset all Projects, Services, and Contact info to initial default values?')) {
-        try {
-          const result = await apiRequest('reset', {method:'POST'});
-          projects = result.data.projects; services = result.data.services; contact = result.data.contact;
-          renderOverview(); renderProjects(); renderServices(); renderContactForm();
-          showToast('All data has been reset to defaults.');
-        } catch (err) { showToast(err.message || 'Could not reset data.'); }
-      }
-    });
-  }
+// Utility: Image compressor
+function compressImage(base64Str, maxWidth, quality, callback, onError) {
+  const img = new Image();
+  img.onerror = () => onError(new Error('Could not open this image.'));
+  img.src = base64Str;
+  img.onload = () => {
+    let width = img.width;
+    let height = img.height;
+
+    if (width > maxWidth) {
+      height = Math.round((height * maxWidth) / width);
+      width = maxWidth;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const compressed = canvas.toDataURL('image/jpeg', quality);
+    callback(compressed);
+  };
 }
 
 // Helper: Escape HTML string
