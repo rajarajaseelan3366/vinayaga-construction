@@ -1513,6 +1513,6 @@ section {
 .reveal-delay-4 { transition-delay: 0.4s; }
 /* Bigger text on phones */
 @media (max-width: 768px) {
-  html { font-size: 19px; }
+  html { font-size: 22px; }
   body { font-size: 1rem; }
 }
